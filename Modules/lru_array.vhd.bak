@@ -1,0 +1,27 @@
+LIBRARY ieee;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity lru_array is
+    port(clk,k,ask:in STD_LOGIC;
+         address:in STD_LOGIC_VECTOR(5 downto 0);
+         output:out STD_LOGIC);
+end lru_array;
+
+architecture dataflow of data_array is
+    type lru_array is array (63 downto 0) of std_logic;
+
+    signal lru_array_instance : lru_array;
+begin
+    process(clk)
+    begin
+        if(ask = '0' and  clk='1') then
+            lru_array_instance(to_integer(unsigned(address))) <= not k;
+        end if;
+		
+		if(ask = '1' and  clk='1') then
+            output<=lru_array_instance(to_integer(unsigned(address)));
+        end if;
+    end process;
+
+end dataflow;
