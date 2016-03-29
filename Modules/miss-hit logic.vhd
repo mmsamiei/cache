@@ -3,7 +3,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity miss_hit_logic is
-    port(hit,w0_valid,w1_valid:buffer STD_LOGIC;
+    port(hit,w0_valid,w1_valid:buffer STD_LOGIC:='0';
          tag:in STD_LOGIC_VECTOR(3 downto 0);
          w0,w1:in STD_LOGIC_VECTOR(4 downto 0));
 end miss_hit_logic;
@@ -26,6 +26,9 @@ begin
 		if(hit/='1')then
 			hit<='0';
 		end if;
+		
+	
+		
 	end process;
 end dataflow;
 

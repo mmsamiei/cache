@@ -63,15 +63,21 @@ begin
 	k0_tag_invalidate<=hit_logic_hit and write;
 	k1_tag_invalidate<=hit_logic_hit and write;
  	
-	k0_tag_wren<= not (hit_logic_hit) and not (output_lru_array);
-	k1_tag_wren<= not (hit_logic_hit) and     (output_lru_array);	
 	
-	k0_wren<= (not (hit_logic_hit) and not (output_lru_array)) or not k0_tag_output(4);
-	k1_wren<= (not (hit_logic_hit) and  (output_lru_array)) or (not k0_tag_output(4) and k0_tag_output(4)) ;
+	
+	k0_tag_wren<= k0_wren;
+	k1_tag_wren<= k1_wren;
+	
+	--k0_wren<= (not (hit_logic_hit) and not (output_lru_array)) ;
+	--k1_wren<= (not (hit_logic_hit) and  (output_lru_array)) ;
 	 
+	k0_wren<= not output_lru_array and write;
+	k1_wren<= output_lru_array and write;
 	 
-	inform_lru_array<=(hit_logic_hit) and write;
-	k_lru_array<=hit_logic_w1_valid;
+	--inform_lru_array<=(hit_logic_hit) and write;
+	k_lru_array<=k1_wren;
+	
+	inform_lru_array<=write;
 	
 	
 	

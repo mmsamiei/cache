@@ -33,6 +33,6 @@ begin
 		
         output <= valid_array_instance(to_integer(unsigned(address)))&tag_array_instance(to_integer(unsigned(address)));
     end process;
-output <= valid_array_instance(to_integer(unsigned(address)))&tag_array_instance(to_integer(unsigned(address)));
+--output <= valid_array_instance(to_integer(unsigned(address)))&tag_array_instance(to_integer(unsigned(address)));
 end dataflow;
 
