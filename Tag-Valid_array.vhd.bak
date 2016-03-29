@@ -1,0 +1,35 @@
+LIBRARY ieee;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity Tag_Valid_array is
+    port(clk, wren,reset_n,invalidate:in STD_LOGIC;
+         address:in STD_LOGIC_VECTOR(5 downto 0);
+         wrdata:in STD_LOGIC_VECTOR(3 downto 0);
+         output:out STD_LOGIC_VECTOR(4 downto 0));
+end Tag_Valid_array;
+
+architecture dataflow of Tag_Valid_array is
+    
+	type tag_array is array (63 downto 0) of std_logic_vector (3 downto 0);
+	type valid_array is array (63 downto 0) of std_logic;
+	
+	signal tag_array_instance : tag_array;
+	signal valid_array_instance : valid_array;
+	
+begin
+    process(clk)
+    begin
+        if(wren = '1' and  clk='1') then
+            tag_array(to_integer(unsigned(address))) <= wrdata;
+        end if;
+
+		if(invalidate = '1' and  clk='1') then
+            valid_array(to_integer(unsigned(address))) <= '0';
+        end if;
+		
+        output <= tag_array(to_integer(unsigned(address)))&valid_array(to_integer(unsigned(address)));
+    end process;
+
+end dataflow;
+
