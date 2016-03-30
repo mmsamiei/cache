@@ -15,7 +15,7 @@ architecture dataflow of Tag_Valid_array is
 	type valid_array is array (63 downto 0) of std_logic ;
 	
 	signal tag_array_instance : tag_array ;
-	signal valid_array_instance : valid_array := (others=>'0');
+	signal valid_array_instance : valid_array := (others=>'1');
 	
 begin
     process(clk,wren,invalidate,tag_array_instance,valid_array_instance)

@@ -3,7 +3,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity cache is
-    port(clk,write:in STD_LOGIC;
+    port(clk,write_to_cache,write:in STD_LOGIC;
 		full_address:in STD_LOGIC_VECTOR(9 downto 0);
         wrdata:in STD_LOGIC_VECTOR(31 downto 0);
 		hit:out std_logic;
@@ -34,6 +34,11 @@ architecture dataflow of cache is
          output:out STD_LOGIC_VECTOR(4 downto 0));
 	end component;
 	
+	component my_mux port ( a,b : in  std_logic_vector(31 downto 0);
+       s : in  std_logic;
+       o : out std_logic_vector(31 downto 0));
+	end component;
+	
 	
 	type state_type is (s0, s1, s2, s3);
 	signal state   : state_type;
@@ -62,8 +67,8 @@ architecture dataflow of cache is
 	
 begin
 
-	k0_tag_invalidate<=hit_logic_hit and write;
-	k1_tag_invalidate<=hit_logic_hit and write;
+	k0_tag_invalidate<=hit_logic_w0_valid and write;
+	k1_tag_invalidate<=hit_logic_w1_valid and write;
  	
 	
 	
@@ -73,12 +78,12 @@ begin
 	--k0_wren<= (not (hit_logic_hit) and not (output_lru_array)) ;
 	--k1_wren<= (not (hit_logic_hit) and  (output_lru_array)) ;
 	 
-	k0_wren<= not output_lru_array and write and lru_ready;
-	k1_wren<= output_lru_array and write and lru_ready;
+	k0_wren<= not output_lru_array and write_to_cache and lru_ready;
+	k1_wren<= output_lru_array and write_to_cache and lru_ready;
 	 
 	--inform_lru_array<=(hit_logic_hit) and write;
 	
-	inform_lru_array<=write;
+	inform_lru_array<=write_to_cache;
 	
 	
 	
@@ -95,7 +100,7 @@ begin
 	
 	miss_hit_circuite : miss_hit_logic port map (hit=>hit_logic_hit,w0_valid=>hit_logic_w0_valid,w1_valid=>hit_logic_w1_valid,tag=>full_address(9 downto 6),w0=>k0_tag_output,w1=>k1_tag_output);
 	
-	
+	data_mux : my_mux port map (a=>k0_data,b=>k1_data,s=>hit_logic_w1_valid,o=>data);
 	
 	
 	
