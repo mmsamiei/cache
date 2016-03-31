@@ -98,7 +98,7 @@ begin
 	
 	lru_circuite : lru_array port map(clk=>clk,inform=>inform_lru_array,address=>full_address(5 downto 0),output=>output_lru_array,ready=>lru_ready);
 	
-	miss_hit_circuite : miss_hit_logic port map (hit=>hit_logic_hit,w0_valid=>hit_logic_w0_valid,w1_valid=>hit_logic_w1_valid,tag=>full_address(9 downto 6),w0=>k0_tag_output,w1=>k1_tag_output);
+	miss_hit_circuite : miss_hit_logic port map (hit=>hit,w0_valid=>hit_logic_w0_valid,w1_valid=>hit_logic_w1_valid,tag=>full_address(9 downto 6),w0=>k0_tag_output,w1=>k1_tag_output);
 	
 	data_mux : my_mux port map (a=>k0_data,b=>k1_data,s=>hit_logic_w1_valid,o=>data);
 	
