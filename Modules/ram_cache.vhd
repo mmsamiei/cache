@@ -47,34 +47,46 @@ begin
 	process(clk)
 	begin
 	if(reset='1')then
-		state<=s0;
-		read<='0';
-		write<='0';
-		ram_rw<='0';
+		
+		cache_write_to_cache<='0';
 		cache_write<='0';
+		ram_rw<='0';
+		state<=s0;
+		reset<='0';
+		
 	elsif (rising_edge(clk)) then
 		case state is
 			when s0=>
-				if(write<='1')then
+				cache_write_to_cache<='0';
+				cache_write<='0';
+				ram_rw<='0';
+				if(write='1')then
 					state<=s1;
-				elsif(read<='1')then
+				elsif(read='1')then
 					state<=s2;
 				end if;
 			when s1=>
-				cache_write<='1';
 				ram_Data_in<=wrdata;
 				ram_rw<='1';
-				reset<='1';
+				cache_write<='1';
+				state<=s0;
 			when s2=>
-			
+				if(cache_hit='1')then
+					state<=s0;
+				elsif(cache_hit='0')then
+					state<=s3;
+				end if;	
 			when s3=>
-			
+				cache_wrdata<=ram_Data_out;
+				cache_write_to_cache<='1';
+				cache_write_to_cache<=transport '0' after 10ns;
+				state<=s0;
 			when s4=>
 			
 			when s5=>
 			
 			when s6=>
-			
+				
 			when s7=>
 		end case;
 	end if;

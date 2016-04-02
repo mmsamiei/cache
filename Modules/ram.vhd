@@ -16,6 +16,7 @@ architecture dataflow of ram is
 begin
     process(clk,rw,Data_in)
     begin
+		Data_ready<='0';
         if(rw = '1' and  clk='1') then
             data_array(to_integer(unsigned(address))) <= Data_in;
 			Data_ready<='0';
@@ -23,6 +24,7 @@ begin
 		if(rw = '0' and  clk='1') then
 			Data_out<=data_array(to_integer(unsigned(address)));
 			Data_ready<='1';
+			Data_ready<=transport '0' after 10ns;
 		end if;
     end process;
 
