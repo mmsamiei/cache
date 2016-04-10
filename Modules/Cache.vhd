@@ -7,6 +7,7 @@ entity cache is
 		full_address:in STD_LOGIC_VECTOR(9 downto 0);
         wrdata:in STD_LOGIC_VECTOR(31 downto 0);
 		hit:out std_logic;
+		reset_n:in STD_LOGIC;
 		data:out STD_LOGIC_VECTOR(31 downto 0));
 end cache;
 
@@ -28,9 +29,10 @@ architecture dataflow of cache is
          w0,w1:in STD_LOGIC_VECTOR(4 downto 0));
 	end component;
 	
-	component Tag_Valid_array port(clk, wren,reset_n,invalidate:in STD_LOGIC;
+	component Tag_Valid_array port(clk, wren,invalidate:in STD_LOGIC;
          address:in STD_LOGIC_VECTOR(5 downto 0);
          wrdata:in STD_LOGIC_VECTOR(3 downto 0);
+		 		 reset_n:in STD_LOGIC;
          output:out STD_LOGIC_VECTOR(4 downto 0));
 	end component;
 	
@@ -40,8 +42,7 @@ architecture dataflow of cache is
 	end component;
 	
 	
-	type state_type is (s0, s1, s2, s3);
-	signal state   : state_type;
+
 	
 	
 	signal k0_wren:std_logic;
@@ -78,8 +79,8 @@ begin
 	--k0_wren<= (not (hit_logic_hit) and not (output_lru_array)) ;
 	--k1_wren<= (not (hit_logic_hit) and  (output_lru_array)) ;
 	 
-	k0_wren<= not output_lru_array and write_to_cache and lru_ready;
-	k1_wren<= output_lru_array and write_to_cache and lru_ready;
+	k0_wren<= (not k0_tag_output(4) and write_to_cache) or (not output_lru_array and write_to_cache and lru_ready);
+	k1_wren<=((not k1_tag_output(4) and write_to_cache and k0_tag_output(4)) or (output_lru_array and write_to_cache and lru_ready)) and (not k0_tag_wren);
 	 
 	--inform_lru_array<=(hit_logic_hit) and write;
 	
@@ -92,9 +93,9 @@ begin
 	
 	k1_data_array: data_array port map(clk=>clk,wren=>k1_wren,address=>full_address(5 downto 0),wrdata=>wrdata,data=>k1_data);
 	
-	k0_Tag_Valid_array: Tag_Valid_array port map(clk=>clk,wren=>k0_tag_wren,invalidate=>k0_tag_invalidate,address=>full_address(5 downto 0),wrdata=>full_address(9 downto 6),output=>k0_tag_output,reset_n=>'0');
+	k0_Tag_Valid_array: Tag_Valid_array port map(clk=>clk,wren=>k0_tag_wren,invalidate=>k0_tag_invalidate,address=>full_address(5 downto 0),wrdata=>full_address(9 downto 6),output=>k0_tag_output,reset_n=>reset_n);
 	
-	k1_Tag_Valid_array: Tag_Valid_array port map(clk=>clk,wren=>k1_tag_wren,invalidate=>k1_tag_invalidate,address=>full_address(5 downto 0),wrdata=>full_address(9 downto 6),output=>k1_tag_output,reset_n=>'0');
+	k1_Tag_Valid_array: Tag_Valid_array port map(clk=>clk,wren=>k1_tag_wren,invalidate=>k1_tag_invalidate,address=>full_address(5 downto 0),wrdata=>full_address(9 downto 6),output=>k1_tag_output,reset_n=>reset_n);
 	
 	lru_circuite : lru_array port map(clk=>clk,inform=>inform_lru_array,address=>full_address(5 downto 0),output=>output_lru_array,ready=>lru_ready);
 	

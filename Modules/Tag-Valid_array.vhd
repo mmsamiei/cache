@@ -3,9 +3,10 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity Tag_Valid_array is
-    port(clk, wren,reset_n,invalidate:in STD_LOGIC;
+    port(clk, wren,invalidate:in STD_LOGIC;
          address:in STD_LOGIC_VECTOR(5 downto 0);
          wrdata:in STD_LOGIC_VECTOR(3 downto 0);
+		 reset_n:in STD_LOGIC;
          output:out STD_LOGIC_VECTOR(4 downto 0));
 end Tag_Valid_array;
 
@@ -20,6 +21,10 @@ architecture dataflow of Tag_Valid_array is
 begin
     process(clk,wren,invalidate,tag_array_instance,valid_array_instance)
     begin
+		if(reset_n='1')then
+			valid_array_instance <= (others=> '0');
+		end if;
+	
         if(wren = '1' and  clk='1') then
             tag_array_instance(to_integer(unsigned(address))) <= wrdata;
 			valid_array_instance(to_integer(unsigned(address)))<='1';
@@ -35,4 +40,3 @@ begin
     end process;
 --output <= valid_array_instance(to_integer(unsigned(address)))&tag_array_instance(to_integer(unsigned(address)));
 end dataflow;
-

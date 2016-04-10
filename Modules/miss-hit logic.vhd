@@ -26,10 +26,6 @@ begin
 		else
 			w1_valid <= '0';
         end if;
-        --hit<= w1_valid or w0_valid;
-		--if(hit/='1')then
-		--	hit<='0';
-		--end if;
 	end process;
 	--hit<=w1_valid or w0_valid;
 end dataflow;

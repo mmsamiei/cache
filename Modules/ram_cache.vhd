@@ -3,15 +3,16 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity ram_cache is
-    port(clk, reset,read,write:buffer STD_LOGIC;
+    port(clk,read,write:buffer STD_LOGIC;
          addr:in STD_LOGIC_VECTOR(9 downto 0);
          wrdata:in STD_LOGIC_VECTOR(31 downto 0);
+		 reset_n:in STD_LOGIC;
          rddata:out STD_LOGIC_VECTOR(31 downto 0));
 end ram_cache;
 
 architecture dataflow of ram_cache is
     
-	type state_type is (s0, s1, s2, s3,s4,s5,s6,s7);
+	type state_type is (s0, s1, s2, s3);
 	signal state   : state_type;
 	
 	component ram is
@@ -27,6 +28,7 @@ architecture dataflow of ram_cache is
 		full_address:in STD_LOGIC_VECTOR(9 downto 0);
         wrdata:in STD_LOGIC_VECTOR(31 downto 0);
 		hit:out std_logic;
+		reset_n:in STD_LOGIC;
 		data:out STD_LOGIC_VECTOR(31 downto 0));
 	end component;
 	
@@ -42,17 +44,16 @@ architecture dataflow of ram_cache is
 	
 begin
 	myRam : ram port map(clk=>clk,rw=>ram_rw,address=>addr,Data_in=>ram_Data_in,Data_out=>ram_Data_out,Data_ready=>ram_Data_ready);
-	myCache : cache port map(clk=>clk,write_to_cache=>cache_write_to_cache,write=>cache_write,full_address=>addr,wrdata=>cache_wrdata,hit=>cache_hit,data=>cache_data);
+	myCache : cache port map(clk=>clk,write_to_cache=>cache_write_to_cache,write=>cache_write,full_address=>addr,wrdata=>cache_wrdata,hit=>cache_hit,data=>rddata,reset_n=>reset_n);
 	
 	process(clk)
 	begin
-	if(reset='1')then
+	if(reset_n='1')then
 		
 		cache_write_to_cache<='0';
 		cache_write<='0';
 		ram_rw<='0';
 		state<=s0;
-		reset<='0';
 		
 	elsif (rising_edge(clk)) then
 		case state is
@@ -81,13 +82,6 @@ begin
 				cache_write_to_cache<='1';
 				cache_write_to_cache<=transport '0' after 10ns;
 				state<=s0;
-			when s4=>
-			
-			when s5=>
-			
-			when s6=>
-				
-			when s7=>
 		end case;
 	end if;
 	end process;
